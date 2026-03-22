@@ -5,10 +5,32 @@ import pickle
 scaler = pickle.load(open("scaler.pkl", "rb"))
 kmeans = pickle.load(open("kmeans.pkl", "rb"))
 
-cluster_names = {
-    0: "High-Income Overextended",
-    1: "Balanced Planner",
-    2: "Financially Constrained"
+cluster_details = {
+    0: {
+        "insight": "You have a high income but tend to overspend, especially on non-essential items.",
+        "gaps": ["Low savings discipline", "High discretionary spending"],
+        "actions": [
+            "Reduce discretionary spending by at least 20%",
+            "Set a fixed monthly savings goal (minimum 25% of income)"
+        ]
+    },
+    1: {
+        "insight": "You maintain a balanced financial lifestyle with controlled spending and savings.",
+        "gaps": ["Scope to optimize investments", "Can increase savings rate"],
+        "actions": [
+            "Increase savings by 5-10% gradually",
+            "Start investing in diversified assets (e.g., mutual funds)"
+        ]
+    },
+    2: {
+        "insight": "Your expenses are high relative to your income, making it difficult to save.",
+        "gaps": ["Low or negative savings", "High essential expense burden"],
+        "actions": [
+            "Track and reduce essential expenses where possible",
+            "Create a strict monthly budget plan",
+            "Focus on increasing income sources if possible"
+        ]
+    }
 }
 
 st.title("Student Financial Persona Analyzer")
@@ -34,4 +56,16 @@ if st.button("Analyze"):
     user_scaled = scaler.transform(user_features)
     cluster_id = kmeans.predict(user_scaled)[0]
 
-    st.success(f"Your Financial Persona: {cluster_names[cluster_id]}")
+    # st.success(f"Your Financial Persona: {cluster_details[cluster_id]}")
+    details = cluster_details[cluster_id]
+
+    st.subheader("📊 Insight")
+    st.write(details["insight"])
+
+    st.subheader("⚠️ Financial Gaps")
+    for gap in details["gaps"]:
+        st.write(f"- {gap}")
+
+    st.subheader("🎯 Recommended Actions")
+    for action in details["actions"]:
+        st.write(f"- {action}")
