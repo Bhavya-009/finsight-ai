@@ -1,5 +1,6 @@
 import streamlit as st
 import pickle
+import time
 
 # Load models
 scaler = pickle.load(open("scaler.pkl", "rb"))
@@ -72,9 +73,22 @@ if st.button("Analyze"):
         essential_pct
     ]]
 
-    cluster_id = behavior_agent(user_features, scaler, kmeans)
-    details = gap_agent(cluster_id, cluster_details)
-    actions = action_agent(details)
+    st.subheader("🤖 AI Agent Workflow")
+
+    with st.spinner("Running Behavior Analysis Agent..."):
+        time.sleep(1)
+        cluster_id = behavior_agent(user_features, scaler, kmeans)
+    st.info("✔ Behavior Analysis Completed")
+
+    with st.spinner("Detecting Financial Gaps..."):
+        time.sleep(1)
+        details = gap_agent(cluster_id, cluster_details)
+    st.info("✔ Gap Detection Completed")
+
+    with st.spinner("Generating Action Plan..."):
+        time.sleep(1)
+        actions = action_agent(details)
+    st.info("✔ Action Planning Completed")
 
     st.success(f"Your Financial Persona: {cluster_names[cluster_id]}")
 
