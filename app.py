@@ -5,6 +5,12 @@ import pickle
 scaler = pickle.load(open("scaler.pkl", "rb"))
 kmeans = pickle.load(open("kmeans.pkl", "rb"))
 
+cluster_names = {
+    0: "High Earner, Low Saver",
+    1: "Financially Balanced",
+    2: "Struggling Saver"
+}
+
 cluster_details = {
     0: {
         "insight": "You have a high income but tend to overspend, especially on non-essential items.",
@@ -39,6 +45,19 @@ monthly_income = st.number_input("Monthly Income", min_value=0.0)
 essential_spend = st.number_input("Essential Spending", min_value=0.0)
 discretionary_spend = st.number_input("Discretionary Spending", min_value=0.0)
 
+def behavior_agent(user_features, scaler, kmeans):
+    user_scaled = scaler.transform(user_features)
+    cluster_id = kmeans.predict(user_scaled)[0]
+    return cluster_id
+
+
+def gap_agent(cluster_id, cluster_details):
+    return cluster_details[cluster_id]
+
+
+def action_agent(details):
+    return details["actions"]
+
 if st.button("Analyze"):
 
     total_expense = essential_spend + discretionary_spend
@@ -53,11 +72,11 @@ if st.button("Analyze"):
         essential_pct
     ]]
 
-    user_scaled = scaler.transform(user_features)
-    cluster_id = kmeans.predict(user_scaled)[0]
+    cluster_id = behavior_agent(user_features, scaler, kmeans)
+    details = gap_agent(cluster_id, cluster_details)
+    actions = action_agent(details)
 
-    # st.success(f"Your Financial Persona: {cluster_details[cluster_id]}")
-    details = cluster_details[cluster_id]
+    st.success(f"Your Financial Persona: {cluster_names[cluster_id]}")
 
     st.subheader("📊 Insight")
     st.write(details["insight"])
